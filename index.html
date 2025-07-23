@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -77,11 +76,21 @@
     <form id="leadForm" action="https://test.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST">
       <input type="hidden" name="oid" value="00DHa000003AAMB">
 
+      <div class="full-width">
+        <label>CNPJ:</label>
+        <input type="text" id="cnpj" name="cnpj" placeholder="Digite o CNPJ (somente números)" required>
+      </div>
+
+      <div><label>Razão Social:</label><input type="text" name="company" id="company" required></div>
+      <div><label>Nome Fantasia:</label><input type="text" name="fantasia" id="fantasia"></div>
+      <div><label>Telefone:</label><input type="text" name="phone" id="phone"></div>
+      <div><label>E-mail:</label><input type="email" name="email" id="email" required></div>
+
+      <div class="full-width"><label>Endereço:</label><input type="text" name="endereco" id="endereco"></div>
+
       <div><label>Nome:</label><input type="text" name="first_name" required></div>
       <div><label>Sobrenome:</label><input type="text" name="last_name" required></div>
-      <div><label>E-mail:</label><input type="email" name="email" required></div>
-      <div><label>Telefone:</label><input type="text" name="phone"></div>
-      <div><label>Empresa:</label><input type="text" name="company" required></div>
+
       <div>
         <label>Especialista no ramo imobiliário:</label>
         <select name="especialista_imob">
@@ -154,6 +163,38 @@
         form.style.display = "none";
         thanks.style.display = "block";
       }
+    });
+
+    const cnpjInput = document.getElementById("cnpj");
+    const companyInput = document.getElementById("company");
+    const fantasiaInput = document.getElementById("fantasia");
+    const phoneInput = document.getElementById("phone");
+    const emailInput = document.getElementById("email");
+    const enderecoInput = document.getElementById("endereco");
+
+    cnpjInput.addEventListener("blur", () => {
+      const cnpj = cnpjInput.value.replace(/\D/g, "");
+      if (cnpj.length !== 14) {
+        alert("CNPJ inválido. Deve conter 14 dígitos.");
+        return;
+      }
+
+      fetch(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "OK") {
+            companyInput.value = data.nome || "";
+            fantasiaInput.value = data.fantasia || "";
+            phoneInput.value = data.telefone || "";
+            emailInput.value = data.email || "";
+            enderecoInput.value = `${data.logradouro || ""}, ${data.numero || ""}, ${data.bairro || ""}, ${data.municipio || ""} - ${data.uf || ""}, ${data.cep || ""}`;
+          } else {
+            alert("CNPJ não encontrado ou limite da API atingido.");
+          }
+        })
+        .catch(() => {
+          alert("Erro ao consultar o CNPJ. Tente novamente mais tarde.");
+        });
     });
   </script>
 
