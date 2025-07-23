@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Formulário de Cadastro</title>
-  <script src="https://www.google.com/recaptcha/api.js"></script>
   <style>
     body {
       background: linear-gradient(to bottom, #ffffff 30%, #0073ff 30%);
@@ -67,17 +66,6 @@
       display: none;
     }
   </style>
-  <script>
-    function timestamp() {
-      var response = document.getElementById("g-recaptcha-response");
-      if (response == null || response.value.trim() == "") {
-        var elems = JSON.parse(document.getElementsByName("captcha_settings")[0].value);
-        elems["ts"] = JSON.stringify(new Date().getTime());
-        document.getElementsByName("captcha_settings")[0].value = JSON.stringify(elems);
-      }
-    }
-    setInterval(timestamp, 500);
-  </script>
 </head>
 <body>
   <div class="form-container">
@@ -86,7 +74,6 @@
 
     <form id="leadForm" action="https://test.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST">
       <input type="hidden" name="oid" value="00DHa000003AAMB">
-      <input type="hidden" name="captcha_settings" value='{"keyname":"ItaSeguros","fallback":"true","orgId":"00D880000058QaL","ts":""}'>
 
       <div class="full-width"><label>CNPJ:</label><input type="text" name="cnpj" required></div>
       <div><label>Razão Social:</label><input type="text" name="company" required></div>
@@ -143,10 +130,6 @@
         <select name="agendar" id="agendar" required>
           <option value="">Selecione</option><option value="Sim">Sim</option><option value="Não">Não</option>
         </select>
-      </div>
-
-      <div class="full-width">
-        <div class="g-recaptcha" data-sitekey="6LcPhwkbAAAAAIwJWp5mqlv6tvEtyHD-PMuFpJxB"></div>
       </div>
 
       <input type="submit" class="submit-button" value="ENVIAR">
