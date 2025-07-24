@@ -238,19 +238,30 @@
           return;
         }
 
+        function preencherCampos(data) {
+          nomeField.value = data.nome || data.estabelecimento?.razao_social || "";
+          fantasiaField.value = data.fantasia || data.estabelecimento?.nome_fantasia || "";
+          emailField.value = data.email || data.estabelecimento?.email || "";
+          telefoneField.value = data.telefone || (data.estabelecimento?.ddd1 && data.estabelecimento?.telefone1 ? `${data.estabelecimento.ddd1}${data.estabelecimento.telefone1}` : "");
+          enderecoField.value = data.logradouro || data.estabelecimento?.logradouro
+            ? `${data.estabelecimento?.logradouro || ""}, ${data.estabelecimento?.numero || ""} - ${data.estabelecimento?.bairro || ""}, ${data.estabelecimento?.cidade?.nome || ""} - ${data.estabelecimento?.estado?.sigla || ""}`
+            : "";
+        }
+
         fetch(`https://formulario-zurich.onrender.com/cnpj/${rawCNPJ}`)
-          .then(res => res.json())
+          .then(res => res.ok ? res.json() : Promise.reject('API Zurich indisponível'))
           .then(data => {
             if (data.status === "ERROR") throw new Error(data.message);
-            nomeField.value = data.nome || "";
-            fantasiaField.value = data.fantasia || "";
-            emailField.value = data.email || "";
-            telefoneField.value = data.telefone || "";
-            enderecoField.value = `${data.logradouro || ""}, ${data.numero || ""} ${data.complemento || ""} - ${data.bairro || ""}, ${data.municipio || ""} - ${data.uf || ""}`;
+            preencherCampos(data);
           })
-          .catch(err => {
-            console.error(err);
-            alert("Erro ao consultar o CNPJ. Tente novamente mais tarde.");
+          .catch(() => {
+            fetch(`https://publica.cnpj.ws/cnpj/${rawCNPJ}`)
+              .then(res => res.ok ? res.json() : Promise.reject('API pública falhou'))
+              .then(data => preencherCampos(data))
+              .catch(err => {
+                console.error("Erro ao consultar CNPJ em ambas APIs:", err);
+                alert("Não foi possível buscar os dados do CNPJ. Tente novamente mais tarde.");
+              });
           });
       });
     });
