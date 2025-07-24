@@ -1,3 +1,4 @@
+Dito por si:
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -93,7 +94,6 @@
 
     <form id="leadForm" action="https://test.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST">
       <input type="hidden" name="oid" value="00DHa000003AAMB">
-      <input type="hidden" name="retURL" value="https://salesforcehenrique.github.io/formulario_zurich/">
 
       <div class="full-width"><label>CNPJ:</label><input type="text" name="cnpj" required></div>
       <div><label>Razão Social:</label><input type="text" name="company" required></div>
@@ -141,6 +141,7 @@
           <option value="Rio de Janeiro - RJ">Rio de Janeiro - RJ</option>
           <option value="Belo Horizonte - MG">Belo Horizonte - MG</option>
           <option value="Porto Alegre - RS">Porto Alegre - RS</option>
+          <!-- Adicione outras regiões aqui -->
         </select>
       </div>
 
@@ -188,9 +189,9 @@
     function validarCamposObrigatorios() {
       const obrigatorios = ["cnpj", "company", "email", "first_name", "last_name", "sucursal", "agendar"];
       for (const name of obrigatorios) {
-        const field = form.querySelector(`[name="${name}"]`);
+        const field = form.querySelector([name="${name}"]);
         if (!field || !field.value.trim()) {
-          alert(`O campo "${field.previousElementSibling.innerText}" é obrigatório.`);
+          alert(O campo "${field.previousElementSibling.innerText}" é obrigatório.);
           field.focus();
           return false;
         }
@@ -231,41 +232,27 @@
       const telefoneField = document.querySelector('input[name="phone"]');
       const enderecoField = document.querySelector('input[name="address"]');
 
-      cnpjField.addEventListener("blur", async () => {
-        const raw = cnpjField.value.replace(/\D/g, "");
-        if (raw.length !== 14) return alert("CNPJ inválido");
-
-        const tentarUrl = async url => {
-          const res = await fetch(url);
-          console.log(`GET ${url} =>`, res.status);
-          if (!res.ok) throw new Error(url);
-          return res.json();
-        };
-
-        function preencherCampos(data) {
-          nomeField.value = data.nome || data.estabelecimento?.razao_social || "";
-          fantasiaField.value = data.fantasia || data.estabelecimento?.nome_fantasia || "";
-          emailField.value = data.email || data.estabelecimento?.email || "";
-          telefoneField.value = data.telefone || (data.estabelecimento?.ddd1 && data.estabelecimento?.telefone1 ? `${data.estabelecimento.ddd1}${data.estabelecimento.telefone1}` : "");
-          enderecoField.value = data.logradouro || data.estabelecimento?.logradouro
-            ? `${data.estabelecimento?.logradouro || ""}, ${data.estabelecimento?.numero || ""} - ${data.estabelecimento?.bairro || ""}, ${data.estabelecimento?.cidade?.nome || ""} - ${data.estabelecimento?.estado?.sigla || ""}`
-            : "";
+      cnpjField.addEventListener("blur", function () {
+        const rawCNPJ = cnpjField.value.replace(/[^\d]+/g, "");
+        if (rawCNPJ.length !== 14) {
+          alert("CNPJ inválido. Verifique.");
+          return;
         }
 
-        try {
-          const data = await tentarUrl(`https://formulario-zurich.onrender.com/cnpj/${raw}`);
-          if (data.status === "ERROR") throw new Error(data.message);
-          preencherCampos(data);
-        } catch (err1) {
-          console.warn("Zurich falhou:", err1);
-          try {
-            const data2 = await tentarUrl(`https://publica.cnpj.ws/cnpj/${raw}`);
-            preencherCampos(data2);
-          } catch (err2) {
-            console.error("Fallback pública falhou:", err2);
-            alert("Não foi possível consultar o CNPJ.");
-          }
-        }
+        fetch(https://formulario-zurich.onrender.com/cnpj/${rawCNPJ})
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "ERROR") throw new Error(data.message);
+            nomeField.value = data.nome || "";
+            fantasiaField.value = data.fantasia || "";
+            emailField.value = data.email || "";
+            telefoneField.value = data.telefone || "";
+            enderecoField.value = ${data.logradouro || ""}, ${data.numero || ""} ${data.complemento || ""} - ${data.bairro || ""}, ${data.municipio || ""} - ${data.uf || ""};
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Erro ao consultar o CNPJ. Tente novamente mais tarde.");
+          });
       });
     });
   </script>
