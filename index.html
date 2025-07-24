@@ -65,6 +65,19 @@
       font-size: 18px;
       display: none;
     }
+    #openCalendly {
+      display: none;
+      margin-top: 20px;
+      background-color: #0073ff;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #openCalendly:hover {
+      background-color: #005fd1;
+    }
   </style>
 </head>
 <body>
@@ -116,91 +129,4 @@
       <div class="full-width">
         <label>Região (Sucursal):</label>
         <select name="sucursal" required>
-          <option value="">Selecione uma região</option><option value="São Paulo - SP">São Paulo - SP</option>
-          <option value="Campinas - SP">Campinas - SP</option><option value="Rio de Janeiro - RJ">Rio de Janeiro - RJ</option>
-        </select>
-      </div>
-
-      <div class="full-width"><label>Número da SUSEP:</label>
-        <input type="text" name="numero_susep" placeholder="Ex: 123456789">
-      </div>
-
-      <div class="full-width">
-        <label>Deseja agendar uma reunião agora?</label>
-        <select name="agendar" id="agendar" required>
-          <option value="">Selecione</option><option value="Sim">Sim</option><option value="Não">Não</option>
-        </select>
-      </div>
-
-      <input type="submit" class="submit-button" value="ENVIAR">
-    </form>
-
-    <div id="thanksMessage" class="thank-you">Obrigado! Nossa equipe comercial entrará em contato com você em breve.</div>
-
-    <!-- Calendly container (inicialmente oculto) -->
-    <div id="calendlyContainer" style="display: none; margin-top: 40px;">
-      <div class="calendly-inline-widget" data-url="https://calendly.com/henrique-cscorp" style="min-width:320px;height:630px;"></div>
-    </div>
-  </div>
-
-  <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-
-  <script>
-    const form = document.getElementById("leadForm");
-    const agendar = document.getElementById("agendar");
-    const thanks = document.getElementById("thanksMessage");
-
-    agendar.addEventListener("change", function () {
-      const calendly = document.getElementById("calendlyContainer");
-      calendly.style.display = agendar.value === "Sim" ? "block" : "none";
-    });
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const formData = new FormData(form);
-      fetch(form.action, { method: "POST", body: formData, mode: "no-cors" });
-
-      if (agendar.value === "Sim") {
-        setTimeout(() => {
-          window.scrollTo(0, document.getElementById("calendlyContainer").offsetTop);
-        }, 500);
-      } else {
-        form.style.display = "none";
-        thanks.style.display = "block";
-      }
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const cnpjField = document.querySelector('input[name="cnpj"]');
-      const nomeField = document.querySelector('input[name="company"]');
-      const fantasiaField = document.querySelector('input[name="fantasy"]');
-      const emailField = document.querySelector('input[name="email"]');
-      const telefoneField = document.querySelector('input[name="phone"]');
-      const enderecoField = document.querySelector('input[name="address"]');
-
-      cnpjField.addEventListener("blur", function () {
-        const rawCNPJ = cnpjField.value.replace(/[^\d]+/g, "");
-        if (rawCNPJ.length !== 14) {
-          alert("CNPJ inválido. Verifique.");
-          return;
-        }
-
-        fetch(`https://formulario-zurich.onrender.com/cnpj/${rawCNPJ}`)
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.status === "ERROR") throw new Error(data.message);
-            nomeField.value = data.nome || "";
-            fantasiaField.value = data.fantasia || "";
-            emailField.value = data.email || "";
-            telefoneField.value = data.telefone || "";
-            enderecoField.value = `${data.logradouro || ""}, ${data.numero || ""} ${data.complemento || ""} - ${data.bairro || ""}, ${data.municipio || ""} - ${data.uf || ""}`;
-          })
-          .catch((err) => {
-            console.error(err);
-            alert("Erro ao consultar o CNPJ. Tente novamente mais tarde.");
-          });
-      });
-    });
-  </script>
-</body>
-</html>
+          <option value="">Selecione uma região</option>
