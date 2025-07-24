@@ -4,22 +4,28 @@
   <meta charset="UTF-8">
   <title>Formulário de Cadastro</title>
   <style>
-    body {
-      background: linear-gradient(to bottom, #ffffff 30%, #0073ff 30%);
-      font-family: Arial, sans-serif;
+    html, body {
+      height: 100%;
       margin: 0;
-      padding: 40px;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #ffffff 30%, #0073ff 30%);
     }
     .form-container {
       background-color: white;
       border-radius: 10px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       max-width: 800px;
-      margin: 0 auto;
+      margin: 40px auto;
       padding: 40px;
     }
-    h2 { color: #1a1a1a; text-align: center; }
-    h2 span { color: #0073ff; }
+    h2 {
+      color: #1a1a1a;
+      text-align: center;
+    }
+    h2 span {
+      color: #0073ff;
+    }
     p.subheading {
       text-align: center;
       color: #0073ff;
@@ -67,8 +73,14 @@
       display: none;
     }
     .calendly-inline-widget {
-      min-width: 100%;
+      width: 100%;
       height: 630px;
+      min-height: 630px;
+    }
+    @media (max-width: 768px) {
+      form {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
   <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
@@ -122,102 +134,29 @@
       <div class="full-width">
         <label>Região (Sucursal):</label>
         <select name="sucursal" required>
-  <option value="">Selecione uma região</option>
-  <option value="Aracaju - SE">Aracaju - SE</option>
-  <option value="Belém - PA">Belém - PA</option>
-  <option value="Belo Horizonte - MG">Belo Horizonte - MG</option>
-  <option value="Boa Vista - RR">Boa Vista - RR</option>
-  <option value="Brasília - DF">Brasília - DF</option>
-  <option value="Campo Grande - MS">Campo Grande - MS</option>
-  <option value="Cuiabá - MT">Cuiabá - MT</option>
-  <option value="Curitiba - PR">Curitiba - PR</option>
-  <option value="Florianópolis - SC">Florianópolis - SC</option>
-  <option value="Fortaleza - CE">Fortaleza - CE</option>
-  <option value="Goiânia - GO">Goiânia - GO</option>
-  <option value="João Pessoa - PB">João Pessoa - PB</option>
-  <option value="Macapá - AP">Macapá - AP</option>
-  <option value="Maceió - AL">Maceió - AL</option>
-  <option value="Manaus - AM">Manaus - AM</option>
-  <option value="Natal - RN">Natal - RN</option>
-  <option value="Palmas - TO">Palmas - TO</option>
-  <option value="Porto Alegre - RS">Porto Alegre - RS</option>
-  <option value="Porto Velho - RO">Porto Velho - RO</option>
-  <option value="Recife - PE">Recife - PE</option>
-  <option value="Rio Branco - AC">Rio Branco - AC</option>
-  <option value="Rio de Janeiro - RJ">Rio de Janeiro - RJ</option>
-  <option value="Salvador - BA">Salvador - BA</option>
-  <option value="São Luís - MA">São Luís - MA</option>
-  <option value="São Paulo - SP">São Paulo - SP</option>
-  <option value="Teresina - PI">Teresina - PI</option>
-  <option value="Vitória - ES">Vitória - ES</option>
-</select>
-      </div>
-
-      <div class="full-width"><label>Número da SUSEP:</label>
-        <input type="text" name="numero_susep" placeholder="Ex: 123456789">
-      </div>
-
-      <div class="full-width">
-        <label>Deseja agendar uma reunião agora?</label>
-        <select name="agendar" id="agendar" required>
-          <option value="">Selecione</option><option value="Sim">Sim</option><option value="Não">Não</option>
-        </select>
-      </div>
-
-      <input type="submit" class="submit-button" value="ENVIAR">
-
-      <div id="calendlyContainer" style="display:none;" class="full-width">
-        <div class="calendly-inline-widget" data-url="https://calendly.com/henrique-cscorp?locale=pt"></div>
-      </div>
-    </form>
-
-    <div id="thanksMessage" class="thank-you">Obrigado! Nossa equipe comercial entrará em contato com você em breve.</div>
-  </div>
-
-  <script>
-    document.getElementById("agendar").addEventListener("change", function () {
-      const calendly = document.getElementById("calendlyContainer");
-      calendly.style.display = this.value === "Sim" ? "block" : "none";
-    });
-
-    document.getElementById("leadForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      fetch(this.action, { method: "POST", body: formData, mode: "no-cors" });
-      this.style.display = "none";
-      document.getElementById("thanksMessage").style.display = "block";
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const cnpjField = document.querySelector('input[name="cnpj"]');
-      const nomeField = document.querySelector('input[name="company"]');
-      const fantasiaField = document.querySelector('input[name="fantasy"]');
-      const emailField = document.querySelector('input[name="email"]');
-      const telefoneField = document.querySelector('input[name="phone"]');
-      const enderecoField = document.querySelector('input[name="address"]');
-
-      cnpjField.addEventListener("blur", function () {
-        const rawCNPJ = cnpjField.value.replace(/[^\d]+/g, "");
-        if (rawCNPJ.length !== 14) {
-          alert("CNPJ inválido. Verifique.");
-          return;
-        }
-        fetch(`https://formulario-zurich.onrender.com/cnpj/${rawCNPJ}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === "ERROR") throw new Error(data.message);
-            nomeField.value = data.nome || "";
-            fantasiaField.value = data.fantasia || "";
-            emailField.value = data.email || "";
-            telefoneField.value = data.telefone || "";
-            enderecoField.value = `${data.logradouro || ""}, ${data.numero || ""} ${data.complemento || ""} - ${data.bairro || ""}, ${data.municipio || ""} - ${data.uf || ""}`;
-          })
-          .catch(err => {
-            console.error(err);
-            alert("Erro ao consultar o CNPJ. Tente novamente mais tarde.");
-          });
-      });
-    });
-  </script>
-</body>
-</html>
+          <option value="">Selecione uma região</option>
+          <option value="Aracaju - SE">Aracaju - SE</option>
+          <option value="Belém - PA">Belém - PA</option>
+          <option value="Belo Horizonte - MG">Belo Horizonte - MG</option>
+          <option value="Boa Vista - RR">Boa Vista - RR</option>
+          <option value="Brasília - DF">Brasília - DF</option>
+          <option value="Campo Grande - MS">Campo Grande - MS</option>
+          <option value="Cuiabá - MT">Cuiabá - MT</option>
+          <option value="Curitiba - PR">Curitiba - PR</option>
+          <option value="Florianópolis - SC">Florianópolis - SC</option>
+          <option value="Fortaleza - CE">Fortaleza - CE</option>
+          <option value="Goiânia - GO">Goiânia - GO</option>
+          <option value="João Pessoa - PB">João Pessoa - PB</option>
+          <option value="Macapá - AP">Macapá - AP</option>
+          <option value="Maceió - AL">Maceió - AL</option>
+          <option value="Manaus - AM">Manaus - AM</option>
+          <option value="Natal - RN">Natal - RN</option>
+          <option value="Palmas - TO">Palmas - TO</option>
+          <option value="Porto Alegre - RS">Porto Alegre - RS</option>
+          <option value="Porto Velho - RO">Porto Velho - RO</option>
+          <option value="Recife - PE">Recife - PE</option>
+          <option value="Rio Branco - AC">Rio Branco - AC</option>
+          <option value="Rio de Janeiro - RJ">Rio de Janeiro - RJ</option>
+          <option value="Salvador - BA">Salvador - BA</option>
+          <option value="São Luís - MA">São Luís - MA</option>
+          <option value="São Paulo - SP">São Paulo - SP</
