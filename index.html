@@ -136,12 +136,24 @@
     </form>
 
     <div id="thanksMessage" class="thank-you">Obrigado! Nossa equipe comercial entrará em contato com você em breve.</div>
+
+    <!-- Calendly container (inicialmente oculto) -->
+    <div id="calendlyContainer" style="display: none; margin-top: 40px;">
+      <div class="calendly-inline-widget" data-url="https://calendly.com/henrique-cscorp" style="min-width:320px;height:630px;"></div>
+    </div>
   </div>
+
+  <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
 
   <script>
     const form = document.getElementById("leadForm");
     const agendar = document.getElementById("agendar");
     const thanks = document.getElementById("thanksMessage");
+
+    agendar.addEventListener("change", function () {
+      const calendly = document.getElementById("calendlyContainer");
+      calendly.style.display = agendar.value === "Sim" ? "block" : "none";
+    });
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -150,7 +162,7 @@
 
       if (agendar.value === "Sim") {
         setTimeout(() => {
-          window.location.href = "https://calendar.google.com/calendar/embed?src=henrique@cscorp.tec.br";
+          window.scrollTo(0, document.getElementById("calendlyContainer").offsetTop);
         }, 500);
       } else {
         form.style.display = "none";
