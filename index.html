@@ -65,7 +65,13 @@
       font-size: 18px;
       display: none;
     }
+    .calendly-inline-widget {
+      grid-column: 1 / -1;
+      min-width: 100%;
+      height: 630px;
+    }
   </style>
+  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 </head>
 <body>
   <div class="form-container">
@@ -136,23 +142,27 @@
       </div>
 
       <input type="submit" class="submit-button" value="ENVIAR">
+
+      <div id="calendlyContainer" style="display:none;" class="full-width">
+        <div class="calendly-inline-widget" data-url="https://calendly.com/henrique-cscorp?locale=pt"></div>
+      </div>
     </form>
 
     <div id="thanksMessage" class="thank-you">Obrigado! Nossa equipe comercial entrará em contato com você em breve.</div>
   </div>
 
   <script>
-    const form = document.getElementById("leadForm");
-    const agendar = document.getElementById("agendar");
-    const thanks = document.getElementById("thanksMessage");
+    document.getElementById("agendar").addEventListener("change", function () {
+      const calendly = document.getElementById("calendlyContainer");
+      calendly.style.display = this.value === "Sim" ? "block" : "none";
+    });
 
-    form.addEventListener("submit", function (e) {
+    document.getElementById("leadForm").addEventListener("submit", function (e) {
       e.preventDefault();
-      const formData = new FormData(form);
-      fetch(form.action, { method: "POST", body: formData, mode: "no-cors" });
-
-      form.style.display = "none";
-      thanks.style.display = "block";
+      const formData = new FormData(this);
+      fetch(this.action, { method: "POST", body: formData, mode: "no-cors" });
+      this.style.display = "none";
+      document.getElementById("thanksMessage").style.display = "block";
     });
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -169,10 +179,9 @@
           alert("CNPJ inválido. Verifique.");
           return;
         }
-
         fetch(`https://formulario-zurich.onrender.com/cnpj/${rawCNPJ}`)
-          .then((res) => res.json())
-          .then((data) => {
+          .then(res => res.json())
+          .then(data => {
             if (data.status === "ERROR") throw new Error(data.message);
             nomeField.value = data.nome || "";
             fantasiaField.value = data.fantasia || "";
@@ -180,7 +189,7 @@
             telefoneField.value = data.telefone || "";
             enderecoField.value = `${data.logradouro || ""}, ${data.numero || ""} ${data.complemento || ""} - ${data.bairro || ""}, ${data.municipio || ""} - ${data.uf || ""}`;
           })
-          .catch((err) => {
+          .catch(err => {
             console.error(err);
             alert("Erro ao consultar o CNPJ. Tente novamente mais tarde.");
           });
