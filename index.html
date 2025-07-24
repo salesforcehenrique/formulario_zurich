@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Formulário de Cadastro</title>
+  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
   <style>
     html, body {
       height: 100%;
@@ -83,7 +85,6 @@
       }
     }
   </style>
-  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 </head>
 <body>
   <div class="form-container">
@@ -135,28 +136,124 @@
         <label>Região (Sucursal):</label>
         <select name="sucursal" required>
           <option value="">Selecione uma região</option>
-          <option value="Aracaju - SE">Aracaju - SE</option>
-          <option value="Belém - PA">Belém - PA</option>
-          <option value="Belo Horizonte - MG">Belo Horizonte - MG</option>
-          <option value="Boa Vista - RR">Boa Vista - RR</option>
-          <option value="Brasília - DF">Brasília - DF</option>
-          <option value="Campo Grande - MS">Campo Grande - MS</option>
-          <option value="Cuiabá - MT">Cuiabá - MT</option>
-          <option value="Curitiba - PR">Curitiba - PR</option>
-          <option value="Florianópolis - SC">Florianópolis - SC</option>
-          <option value="Fortaleza - CE">Fortaleza - CE</option>
-          <option value="Goiânia - GO">Goiânia - GO</option>
-          <option value="João Pessoa - PB">João Pessoa - PB</option>
-          <option value="Macapá - AP">Macapá - AP</option>
-          <option value="Maceió - AL">Maceió - AL</option>
-          <option value="Manaus - AM">Manaus - AM</option>
-          <option value="Natal - RN">Natal - RN</option>
-          <option value="Palmas - TO">Palmas - TO</option>
-          <option value="Porto Alegre - RS">Porto Alegre - RS</option>
-          <option value="Porto Velho - RO">Porto Velho - RO</option>
-          <option value="Recife - PE">Recife - PE</option>
-          <option value="Rio Branco - AC">Rio Branco - AC</option>
+          <option value="São Paulo - SP">São Paulo - SP</option>
           <option value="Rio de Janeiro - RJ">Rio de Janeiro - RJ</option>
-          <option value="Salvador - BA">Salvador - BA</option>
-          <option value="São Luís - MA">São Luís - MA</option>
-          <option value="São Paulo - SP">São Paulo - SP</
+          <option value="Belo Horizonte - MG">Belo Horizonte - MG</option>
+          <option value="Porto Alegre - RS">Porto Alegre - RS</option>
+          <!-- Adicione outras regiões aqui -->
+        </select>
+      </div>
+
+      <div class="full-width"><label>Número da SUSEP:</label>
+        <input type="text" name="numero_susep" placeholder="Ex: 123456789">
+      </div>
+
+      <div class="full-width">
+        <label>Deseja agendar uma reunião agora?</label>
+        <select name="agendar" id="agendar" required>
+          <option value="">Selecione</option><option value="Sim">Sim</option><option value="Não">Não</option>
+        </select>
+      </div>
+
+      <input type="submit" class="submit-button" value="ENVIAR">
+
+      <div id="calendlyContainer" style="display:none;" class="full-width">
+        <div class="calendly-inline-widget" data-url="https://calendly.com/henrique-cscorp?locale=pt"></div>
+      </div>
+    </form>
+
+    <div id="thanksMessage" class="thank-you">Obrigado! Nossa equipe comercial entrará em contato com você em breve.</div>
+  </div>
+
+  <script>
+    const form = document.getElementById("leadForm");
+    const calendly = document.getElementById("calendlyContainer");
+    const thanksMessage = document.getElementById("thanksMessage");
+    const agendarSelect = document.getElementById("agendar");
+
+    agendarSelect.addEventListener("change", function () {
+      calendly.style.display = this.value === "Sim" ? "block" : "none";
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!validarCamposObrigatorios()) return;
+      if (agendarSelect.value === "Sim") {
+        alert("Por favor, agende a reunião. O formulário será enviado automaticamente após o agendamento.");
+      } else {
+        enviarFormulario();
+      }
+    });
+
+    function validarCamposObrigatorios() {
+      const obrigatorios = ["cnpj", "company", "email", "first_name", "last_name", "sucursal", "agendar"];
+      for (const name of obrigatorios) {
+        const field = form.querySelector(`[name="${name}"]`);
+        if (!field || !field.value.trim()) {
+          alert(`O campo "${field.previousElementSibling.innerText}" é obrigatório.`);
+          field.focus();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function enviarFormulario() {
+      const formData = new FormData(form);
+      fetch(form.action, { method: "POST", body: formData, mode: "no-cors" });
+      form.style.display = "none";
+      calendly.style.display = "none";
+      thanksMessage.style.display = "block";
+    }
+
+    window.addEventListener("message", function (e) {
+      if (e.origin === "https://calendly.com" && e.data.event === "calendly.event_scheduled") {
+        enviarFormulario();
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      new Cleave('input[name="cnpj"]', {
+        delimiters: ['.', '.', '/', '-'],
+        blocks: [2, 3, 3, 4, 2],
+        numericOnly: true
+      });
+
+      new Cleave('input[name="phone"]', {
+        phone: true,
+        phoneRegionCode: 'BR'
+      });
+
+      const cnpjField = document.querySelector('input[name="cnpj"]');
+      const nomeField = document.querySelector('input[name="company"]');
+      const fantasiaField = document.querySelector('input[name="fantasy"]');
+      const emailField = document.querySelector('input[name="email"]');
+      const telefoneField = document.querySelector('input[name="phone"]');
+      const enderecoField = document.querySelector('input[name="address"]');
+
+      cnpjField.addEventListener("blur", function () {
+        const rawCNPJ = cnpjField.value.replace(/[^\d]+/g, "");
+        if (rawCNPJ.length !== 14) {
+          alert("CNPJ inválido. Verifique.");
+          return;
+        }
+
+        fetch(`https://formulario-zurich.onrender.com/cnpj/${rawCNPJ}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "ERROR") throw new Error(data.message);
+            nomeField.value = data.nome || "";
+            fantasiaField.value = data.fantasia || "";
+            emailField.value = data.email || "";
+            telefoneField.value = data.telefone || "";
+            enderecoField.value = `${data.logradouro || ""}, ${data.numero || ""} ${data.complemento || ""} - ${data.bairro || ""}, ${data.municipio || ""} - ${data.uf || ""}`;
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Erro ao consultar o CNPJ. Tente novamente mais tarde.");
+          });
+      });
+    });
+  </script>
+</body>
+</html>
